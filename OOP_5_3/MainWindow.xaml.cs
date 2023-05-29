@@ -29,7 +29,7 @@ namespace OOP_5_3
             InitializeComponent();
             
             myDB.connect_to_db();
-            
+            myDB.get_some_data();
         }
     }
 }
