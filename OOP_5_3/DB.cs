@@ -1,62 +1,68 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using System.IO;
+using System.Reflection.Metadata;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using MySql.Data.MySqlClient;
 
 namespace OOP_5_3
 {
-    public interface DB_inreface
+    public class DB
     {
-        void connect_to_db();
-        
-
-    }
-    public class DB:DB_inreface
-    {
-        MySql.Data.MySqlClient.MySqlConnection conn;
-        MySqlCommand cmd;
-        MySqlDataReader mysql_request;
-        MySqlDataAdapter data_adapter;
-        DataTable table = new DataTable();
-        MySqlCommandBuilder command_builder;
-        public string myConnectionString = "server=127.0.0.1;uid=root;" +
+        public static string myConnectionString = "server=127.0.0.1;uid=root;" +
             "pwd=;database=shop";
-        byte[] raw;
+        MySql.Data.MySqlClient.MySqlConnection conn = new MySql.Data.MySqlClient.MySqlConnection();
+        MySqlCommand cmd = new MySqlCommand();
+        public BitmapImage bi;
+        MySqlDataReader reader;
+        string SQL= "SELECT * FROM products";
+        byte[] rawData;
         public void connect_to_db()
         {
+            conn.ConnectionString= myConnectionString;
             try
             {
-                conn = new MySql.Data.MySqlClient.MySqlConnection();
-                conn.ConnectionString = myConnectionString;
-                cmd = conn.CreateCommand();
                 conn.Open();
-                MessageBox.Show("Connected");
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Error " + ex.Number + " has occurred: " + ex.Message,
+                    "Error", MessageBoxButton.OK,MessageBoxImage.Error);
             }
         }
-        public string get_some_data()
-        {
-            cmd.CommandText = "SELECT * FROM products;";
-            mysql_request = cmd.ExecuteReader();
-            while (mysql_request.Read())
-            {
-                string respond = "";
-                for (int i = 0; i < mysql_request.FieldCount; i++)
-                {
-                    if (!mysql_request.IsDBNull(i))
-                    {
-                        respond += mysql_request.GetString(i);
-                    }
-                }
-                MessageBox.Show(respond);
-            }
-            return "1";
-        }
-        public void get_image()
-        {
 
+        private static BitmapImage LoadImage(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0) return null;
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageData))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+            image.Freeze();
+            
+            return image;
         }
+
+        public void generateImage()
+        {
+            cmd = new MySqlCommand(SQL, conn);
+            reader = cmd.ExecuteReader();
+            reader.Read();
+            long len = reader.GetBytes(reader.GetOrdinal("image"), 0, null, 0, 0);
+            rawData = new byte[len];
+            len = reader.GetBytes(3, 0, rawData, 0, (int)len);
+            bi = LoadImage(rawData);
+            reader.Close();
+        }
+
     }
 }
