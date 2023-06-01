@@ -27,19 +27,21 @@ namespace OOP_5_3
     {
         DB myDB = new DB();
         public MainWindow()
-        {
-            
+        {   
             InitializeComponent();
-            
             myDB.connect_to_db();
         }
 
         private void my_btn_Click(object sender, RoutedEventArgs e)
         {
-            myDB.generateImage();
-            Image img = new Image();
-            img.Source = myDB.bi;
-            my_grid.Children.Add(img);
+            products_panel.Children.Add(myDB.generate_product_card());
+        }
+        
+        
+
+        private void cart_btn_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
