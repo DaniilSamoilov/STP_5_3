@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,15 +27,22 @@ namespace OOP_5_3
     public partial class MainWindow : Window
     {
         DB myDB = new DB();
+        List<product_card> product_cards = new List<product_card>();
+        DataTable data;
         public MainWindow()
         {   
             InitializeComponent();
             myDB.connect_to_db();
+            data = myDB.GetAllData();
+            foreach(DataRow dr in data.Rows)
+            {
+                MessageBox.Show(dr["image"].ToString());
+            }
         }
 
         private void my_btn_Click(object sender, RoutedEventArgs e)
         {
-            products_panel.Children.Add(myDB.generate_product_card());
+            
         }
         
         
