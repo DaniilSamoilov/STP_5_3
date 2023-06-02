@@ -9,6 +9,12 @@ using MySql.Data.MySqlClient;
 
 namespace OOP_5_3
 {
+    public interface IDB
+    {
+        string myConnectionString { get; set; }
+        DataTable dataTable { get; set; }
+
+    }
     public class DB
     {
         public string myConnectionString = "server=127.0.0.1;uid=root;" +

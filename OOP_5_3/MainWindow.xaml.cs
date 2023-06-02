@@ -27,25 +27,22 @@ namespace OOP_5_3
     public partial class MainWindow : Window
     {
         DB myDB = new DB();
+        internal cart myCart;
         List<product_card> product_cards = new List<product_card>();
         DataTable data;
         public MainWindow()
         {   
             InitializeComponent();
+            myCart = new cart(totalSum);
             myDB.connect_to_db();
             data = myDB.GetAllData();
             foreach(DataRow dr in data.Rows)
             {
-                MessageBox.Show(dr["image"].ToString());
+                var productCard = new product_card(myCart);
+                product_cards.Add(productCard);
+                products_panel.Children.Add(productCard.generateCard(dr));
             }
         }
-
-        private void my_btn_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-        
-        
 
         private void cart_btn_Click(object sender, RoutedEventArgs e)
         {
